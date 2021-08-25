@@ -154,61 +154,61 @@ class Ordine:
         for i in range(0,self.quantita):
             self.pizze += "(*)"
 
-#   Dalla traccia noto che le operazioni bloccanti riguardano il BufferPizze 
-#   Quindi creao un BlockingSet che mi permette di gestire queste operazioni
+# #   Dalla traccia noto che le operazioni bloccanti riguardano il BufferPizze 
+# #   Quindi creao un BlockingSet che mi permette di gestire queste operazioni
 
-class BlockingSet(set):
-    lock = Lock()
-    condition = Condition(lock)
-    tagliaMassima = 10
+# class BlockingSet(set):
+#     lock = Lock()
+#     condition = Condition(lock)
+#     tagliaMassima = 10
 
-    def add(self,_T):
-        with self.lock:
-            while len(self) == self.tagliaMassima:
-                self.condition.wait()
+#     def add(self,_T):
+#         with self.lock:
+#             while len(self) == self.tagliaMassima:
+#                 self.condition.wait()
 
-            self.condition.notifyAll()
-            return super().add(_T)
+#             self.condition.notifyAll()
+#             return super().add(_T)
 
-    def remove(self,_T):
-        with self.lock:
-            retValue = _T in self
-            while not retValue:
-                self.condition.wait()
-                retValue = _T in self 
+#     def remove(self,_T):
+#         with self.lock:
+#             retValue = _T in self
+#             while not retValue:
+#                 self.condition.wait()
+#                 retValue = _T in self 
 
-            super().remove(_T)
-            self.condition.notifyAll()
-            return retValue
-
-
+#             super().remove(_T)
+#             self.condition.notifyAll()
+#             return retValue
 
 
-class Pizzeria:
-    blockingQueue = Queue(10)
-    blockingSet = BlockingSet()
 
 
-    def getOrdine(self):
-        try:
-            return self.blockingQueue.get()
-        finally:
-            pass
-        return None
+# class Pizzeria:
+#     blockingQueue = Queue(10)
+#     blockingSet = BlockingSet()
 
-    def getPizze(self,ordine):
-        self.blockingSet.remove(ordine)
 
-    def putOrdine(self,codicePizza,quantita):
-        ordine = Ordine(codicePizza,quantita)
-        try:
-            self.blockingQueue.put(ordine)
-        finally:
-            pass
-        return ordine
+#     def getOrdine(self):
+#         try:
+#             return self.blockingQueue.get()
+#         finally:
+#             pass
+#         return None
 
-    def putPizze(self,ordine):
-        self.blockingSet.add(ordine)
+#     def getPizze(self,ordine):
+#         self.blockingSet.remove(ordine)
+
+#     def putOrdine(self,codicePizza,quantita):
+#         ordine = Ordine(codicePizza,quantita)
+#         try:
+#             self.blockingQueue.put(ordine)
+#         finally:
+#             pass
+#         return ordine
+
+#     def putPizze(self,ordine):
+#         self.blockingSet.add(ordine)
 
 
 def main():

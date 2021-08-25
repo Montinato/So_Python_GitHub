@@ -22,7 +22,7 @@ class Cliente(Thread):
     def __init__(self,negozio):
         super().__init__()
         self.negozio = negozio 
-        self.zazzera =randint(2000,50000)
+        self.zazzera = randint(2000,50000)
 
     def run(self):
         self.negozio.entra(self)
@@ -56,10 +56,12 @@ class Negozio:
         with self.lock_attesa:
             print("ENTRA "+"Cliente=" + cliente.getName() + " self.poltrona=" + self.poltrona + "\n")
 
-            while(cliente.getName() == self.poltrona):
+            while(cliente.getName() == self.poltrona):          # Se il barbiere dorme sulla poltrona vado in wait 
                 self.conditionAttesa.wait()
 
         # Il cliente aspetta il proprio turno
+
+    
         with self.lock_taglio:
             print("ENTRA "+"Il Cliente %s aspetta il proprio turno " % (cliente.getName()))
             while(cliente.zazzera > 0):
@@ -69,13 +71,13 @@ class Negozio:
     def nextCliente(self):
 
         with self.lock_attesa:
-            self.poltrona = -1
-            cliente = self.sedie.get()
+            self.poltrona = -1              # Il barbiere è seduto sulla poltrona
+            cliente = self.sedie.get()      # Un cliente entra in negozio 
 
-        #with self.lock_attesa:
-            self.poltrona = cliente.getName()
+        with self.lock_attesa:
+            self.poltrona = cliente.getName()               
             print("NEXTCLIENTE "+"Il Cliente %s e' seduto sulla poltrona " % (cliente.getName()))
-            self.conditionAttesa.notifyAll()
+            self.conditionAttesa.notifyAll()        # Sveglio i Thread Cliente che stanno aspettando 
         
         print("NEXTCLIENTE "+"Cliente al taglio %s . \n" % (cliente.getName()))
 
@@ -85,8 +87,7 @@ class Negozio:
 
             print("NEXTCLIENTE "+"Il Cliente %s ha finito " % (cliente.getName()))
             
-            self.conditionTaglio.notifyAll()
-
+            self.conditionTaglio.notifyAll()                    # Sveglio i Thread Cliente che 
 
 
 
